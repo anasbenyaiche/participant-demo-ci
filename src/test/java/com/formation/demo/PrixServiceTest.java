@@ -42,6 +42,6 @@ class PrixServiceTest {
        @Test
    void appliquerRemise_zeroPourcent_laisseLePrixInchange() {
        assertEquals(new BigDecimal("59.90"),
-           service.appliquerRemise(new BigDecimal("59.00"), 0));
+           service.appliquerRemise(new BigDecimal("59.90"), 0));
    }
 }
