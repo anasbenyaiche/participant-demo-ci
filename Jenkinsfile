@@ -55,10 +55,17 @@ stage('SonarQube Analysis') {
     steps {
         withSonarQubeEnv('SonarQube-Local') {
             sh '''
+                if [ -n "$SONAR_AUTH_TOKEN" ]; then
+                    echo "Token injecté correctement"
+                else
+                    echo "Token absent"
+                    exit 1
+                fi
+
                 mvn -B \
-                  org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+                  org.sonarsource.scanner.maven:sonar-maven-plugin:5.8.0.7211:sonar \
                   -Dsonar.projectKey=demo-ci \
-                  -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
+                  -Dsonar.token="$SONAR_AUTH_TOKEN"
             '''
         }
     }
