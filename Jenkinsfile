@@ -19,13 +19,13 @@ pipeline {
       }
     }
     stage('Publish') {
+      when { expression { params.PUBLIER }  }
       steps {
           withCredentials([usernamePassword(credentialsId: 'nexus-deploy',
                  usernameVariable: 'NEXUS_USER',
                  passwordVariable: 'NEXUS_PASSWORD')]) {
          sh 'mvn -B -s ci-settings.xml -DskipTests -Dnexus.url=$NEXUS_URL deploy'
           }
-          when { expression { params.PUBLIER } }
 
       }
     }
