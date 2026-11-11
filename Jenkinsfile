@@ -20,9 +20,9 @@ pipeline {
     }
   }
 
-  post {
-    // TODO C : toujours publier les rapports de tests
-    // TODO D : en cas de succès, archiver le JAR
+  // post {
+  //   // TODO C : toujours publier les rapports de tests
+  //   // TODO D : en cas de succès, archiver le JAR
 
-  }
+  // }
 }
