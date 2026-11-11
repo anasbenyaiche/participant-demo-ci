@@ -51,18 +51,13 @@ pipeline {
       }
     }
 
-stage('SonarQube Analysis') {
-    steps {
+    stage('SonarQube Analysis') {
+      steps {
         withSonarQubeEnv('SonarQube-Local') {
-            sh '''
-                mvn -B \
-                  org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
-                  -Dsonar.projectKey=demo-ci \
-                  -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
-            '''
+          sh 'mvn -B sonar:sonar'
         }
+      }
     }
-}
 
     stage('Quality Gate') {
       steps {
