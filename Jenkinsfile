@@ -3,6 +3,7 @@ pipeline {
   tools { maven 'Maven' }
   triggers { pollSCM('H/2 * * * *') }
   environment { NEXUS_URL = 'http://nexus:8081' }
+  
 
   stages {
     stage('Checkout') {
@@ -10,19 +11,31 @@ pipeline {
     }
     stage('Build & Tests') {
       steps {
-        sh 'echo "building"'
+        // TODO A : construire et tester en mode batch
+        sh 'mvn -B clean verify'
       }
     }
     stage('Publish') {
       steps {
-        sh 'echo "publish"'
+      withCredentials([usernamePassword(credentialsId: 'nexus-deploy',
+                 usernameVariable: 'NEXUS_USER',
+                 passwordVariable: 'NEXUS_PASSWORD')]) {
+         sh 'mvn -B -s ci-settings.xml -DskipTests -Dnexus.url=$NEXUS_URL deploy'
+  }
+
       }
     }
   }
 
-  // post {
-  //   // TODO C : toujours publier les rapports de tests
-  //   // TODO D : en cas de succès, archiver le JAR
+  post {
+    // TODO C : toujours publier les rapports de tests
+    always {
+      junit allowEmptyResults: true, testResults: 'target/surefire-reports/*.xml'
+    }
+    success {
+        // TODO D : en cas de succès, archiver le JAR
+    archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
+    }
 
-  // }
+  }
 }
