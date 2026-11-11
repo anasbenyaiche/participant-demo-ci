@@ -3,7 +3,10 @@ pipeline {
   tools { maven 'Maven' }
   triggers { pollSCM('H/2 * * * *') }
   environment { NEXUS_URL = 'http://nexus:8081' }
-  
+  parameters {
+    booleanParam(name: 'PUBLIER', defaultValue: true,
+                  description: 'Publier l\'artefact dans Nexus')
+  }
 
   stages {
     stage('Checkout') {
@@ -17,11 +20,12 @@ pipeline {
     }
     stage('Publish') {
       steps {
-      withCredentials([usernamePassword(credentialsId: 'nexus-deploy',
+          withCredentials([usernamePassword(credentialsId: 'nexus-deploy',
                  usernameVariable: 'NEXUS_USER',
                  passwordVariable: 'NEXUS_PASSWORD')]) {
          sh 'mvn -B -s ci-settings.xml -DskipTests -Dnexus.url=$NEXUS_URL deploy'
-  }
+          }
+          when { expression { params.PUBLIER } }
 
       }
     }
@@ -33,7 +37,7 @@ pipeline {
       junit allowEmptyResults: true, testResults: 'target/surefire-reports/*.xml'
     }
     success {
-        // TODO D : en cas de succès, archiver le JAR
+    // TODO D : en cas de succès, archiver le JAR
     archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
     }
 
