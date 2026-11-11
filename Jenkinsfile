@@ -29,36 +29,23 @@ pipeline {
 
       }
     }
-    stage('SonarQube Analysis'){
+    stage('SonarQube Analysis') {
       steps {
-        withSonarQubeEnv('sonarqube'){
-          sh 'mvn -B sonar:sonar'stage('SonarQube Analysis') {
-    steps {
         withSonarQubeEnv('SonarQube-Local') {
             sh 'mvn -B sonar:sonar'
         }
+      }
     }
-}
 
-stage('Quality Gate') {
+    stage('Quality Gate') {
     steps {
         timeout(time: 10, unit: 'MINUTES') {
             waitForQualityGate abortPipeline: true
         }
     }
 }
-        }
-      }
-    }
-    stage('Quality Gate') {
-      steps {
-        timeout(time:10, unit:'MINUTES'){
-          waitForQualityGate abortPipeline: true
-        }
-      }
-    }
+    
 
-  }
 
   post {
     // TODO C : toujours publier les rapports de tests
