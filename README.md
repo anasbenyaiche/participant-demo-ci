@@ -27,3 +27,7 @@ Suivez ensuite le **cahier des ateliers**, atelier 1.
 ## Prérequis
 
 JDK 17 ou plus, Maven 3.9, Git, Docker (pour Jenkins, Nexus et SonarQube).
+
+
+   ./mvnw versions:set -DnewVersion=1.1.0-SNAPSHOT -DgenerateBackupPoms=false
+   git commit -am "chore: version de développement 1.1.0-SNAPSHOT"

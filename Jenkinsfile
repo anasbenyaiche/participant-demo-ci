@@ -10,14 +10,12 @@ pipeline {
     }
     stage('Build & Tests') {
       steps {
-        // TODO A : construire et tester en mode batch
+        sh 'echo "building"'
       }
     }
     stage('Publish') {
       steps {
-        // TODO B : injecter le credential 'nexus-deploy'
-        //          dans NEXUS_USER / NEXUS_PASSWORD, puis publier
-        //          avec ci-settings.xml vers $NEXUS_URL
+        sh 'echo "publish"'
       }
     }
   }
@@ -25,5 +23,6 @@ pipeline {
   post {
     // TODO C : toujours publier les rapports de tests
     // TODO D : en cas de succès, archiver le JAR
+    sh 'finir et nettoyer'
   }
 }
