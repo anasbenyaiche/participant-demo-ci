@@ -34,7 +34,22 @@ pipeline {
       }
     }
 
- 
+    stage('Publish') {
+      when {
+        expression { return params.PUBLIER }
+      }
+      steps {
+        withCredentials([
+          usernamePassword(
+            credentialsId: 'nexus-deploy',
+            usernameVariable: 'NEXUS_USER',
+            passwordVariable: 'NEXUS_PASSWORD'
+          )
+        ]) {
+          sh 'mvn -B -s ci-settings.xml -DskipTests -Dnexus.url=$NEXUS_URL deploy'
+        }
+      }
+    }
 
 stage('SonarQube Analysis') {
     steps {
@@ -60,22 +75,6 @@ stage('SonarQube Analysis') {
       steps {
         timeout(time: 10, unit: 'MINUTES') {
           waitForQualityGate abortPipeline: true
-        }
-      }
-    }
-     stage('Publish') {
-      when {
-        expression { return params.PUBLIER }
-      }
-      steps {
-        withCredentials([
-          usernamePassword(
-            credentialsId: 'nexus-deploy',
-            usernameVariable: 'NEXUS_USER',
-            passwordVariable: 'NEXUS_PASSWORD'
-          )
-        ]) {
-          sh 'mvn -B -s ci-settings.xml -DskipTests -Dnexus.url=$NEXUS_URL deploy'
         }
       }
     }

@@ -24,4 +24,13 @@ public class PrixService {
                                        .divide(BigDecimal.valueOf(100));
         return prix.multiply(facteur).setScale(2, RoundingMode.HALF_UP);
     }
+    
+    public BigDecimal appliquerRemiseEncore(BigDecimal prix, int pourcentage) {
+        if (pourcentage < 0 || pourcentage > 100) {
+            throw new IllegalArgumentException("Remise entre 0 et 100 %");
+        }
+        BigDecimal facteur = BigDecimal.valueOf(100L - pourcentage)
+                                       .divide(BigDecimal.valueOf(100));
+        return prix.multiply(facteur).setScale(2, RoundingMode.HALF_UP);
+    }
 }
