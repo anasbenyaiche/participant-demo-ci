@@ -34,22 +34,7 @@ pipeline {
       }
     }
 
-    stage('Publish') {
-      when {
-        expression { return params.PUBLIER }
-      }
-      steps {
-        withCredentials([
-          usernamePassword(
-            credentialsId: 'nexus-deploy',
-            usernameVariable: 'NEXUS_USER',
-            passwordVariable: 'NEXUS_PASSWORD'
-          )
-        ]) {
-          sh 'mvn -B -s ci-settings.xml -DskipTests -Dnexus.url=$NEXUS_URL deploy'
-        }
-      }
-    }
+ 
 
 stage('SonarQube Analysis') {
     steps {
@@ -66,7 +51,7 @@ stage('SonarQube Analysis') {
                   org.sonarsource.scanner.maven:sonar-maven-plugin:5.8.0.7211:sonar \
                   -Dsonar.projectKey=demo-ci \
                   -Dsonar.token="$SONAR_AUTH_TOKEN"
-            '''
+    '''
         }
     }
 }
@@ -78,6 +63,22 @@ stage('SonarQube Analysis') {
         }
       }
     }
+       stage('Publish') {
+      when {
+        expression { return params.PUBLIER }
+      }
+      steps {
+        withCredentials([
+          usernamePassword(
+            credentialsId: 'nexus-deploy',
+            usernameVariable: 'NEXUS_USER',
+            passwordVariable: 'NEXUS_PASSWORD'
+          )
+        ]) {
+          sh 'mvn -B -s ci-settings.xml -DskipTests -Dnexus.url=$NEXUS_URL deploy'
+        }
+      }
+       }
   }
 
   post {
