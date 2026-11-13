@@ -34,10 +34,8 @@ pipeline {
       }
     }
 
- 
-
-stage('SonarQube Analysis') {
-    steps {
+    stage('SonarQube Analysis') {
+      steps {
         withSonarQubeEnv('SonarQube-Local') {
             sh '''
                 if [ -n "$SONAR_AUTH_TOKEN" ]; then
@@ -53,8 +51,8 @@ stage('SonarQube Analysis') {
                   -Dsonar.token="$SONAR_AUTH_TOKEN"
     '''
         }
+      }
     }
-}
 
     stage('Quality Gate') {
       steps {
@@ -63,7 +61,7 @@ stage('SonarQube Analysis') {
         }
       }
     }
-       stage('Publish') {
+    stage('Publish') {
       when {
         expression { return params.PUBLIER }
       }
@@ -78,13 +76,27 @@ stage('SonarQube Analysis') {
           sh 'mvn -B -s ci-settings.xml -DskipTests -Dnexus.url=$NEXUS_URL deploy'
         }
       }
+    }
+    stage('Image Docker') {
+      steps {
+        sh 'docker build -t demo-ci:${BUILD_NUMBER} -t demo-ci:latest .'
+        sh 'docker run --rm demo-ci:${BUILD_NUMBER} 100'
+      }
+    }
+       stage('Push image Nexus') {
+      steps {
+        withCredentials([usernamePassword(credentialsId: 'nexus-deploy',
+                         usernameVariable: 'NEXUS_USER',
+                         passwordVariable: 'NEXUS_PASSWORD')]) {
+          sh '''
+            echo "$NEXUS_PASSWORD" | docker login localhost:8082 -u "$NEXUS_USER" --password-stdin
+            docker tag demo-ci:${BUILD_NUMBER} localhost:8082/demo-ci:${BUILD_NUMBER}
+            docker push localhost:8082/demo-ci:${BUILD_NUMBER}
+            docker logout localhost:8082
+          '''
+        }
+      }
        }
-   stage('Image Docker') {
-     steps {
-       sh 'docker build -t demo-ci:${BUILD_NUMBER} -t demo-ci:latest .'
-       sh 'docker run --rm demo-ci:${BUILD_NUMBER} 100'
-     }
-   }
   }
 
   post {
