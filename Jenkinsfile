@@ -79,15 +79,12 @@ stage('SonarQube Analysis') {
         }
       }
        }
-      stage("docker build"){
-        steps {
-          sh '''
-          docker build -t demo-ci:1.1.0
-          docker image inspect demo-ci:1.1.0
-          '''
-
-        }
-      }
+   stage('Image Docker') {
+     steps {
+       sh 'docker build -t demo-ci:${BUILD_NUMBER} -t demo-ci:latest .'
+       sh 'docker run --rm demo-ci:${BUILD_NUMBER} 100'
+     }
+   }
   }
 
   post {
